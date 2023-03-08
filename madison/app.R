@@ -43,7 +43,7 @@ style_card <- c('border'='1px solid #d3d3d3', 'border-radius'='10px')
 # Plotting Functions
 
 #------------------------------------------------------------------------------
-### PLOT 1 FUNCTION ###
+### PLOT 1 FUNCTION IN PYTHON ###
 def plot_altair1(dff, drop1_chosen):
   barchart = alt.Chart(dff[-pd.isnull(dff[drop1_chosen])]).mark_bar().encode(
     alt.X(drop1_chosen, title='Cost of '+drop1_chosen, axis=alt.Axis(orient='top',format='$.0f')),
@@ -51,12 +51,13 @@ def plot_altair1(dff, drop1_chosen):
     tooltip=[drop1_chosen,'province']).configure_axis(labelFontSize = 16, titleFontSize=20)
 return barchart.to_html()
 
+# plot 1 in R
 plot_1 <- function(dff, drop1_chosen){
-  barchart <- ggplot(data = dff, aes(x = drop1_chosen, y = 'city')) +
-    geom_bar(stat="identity")
+  barchart <- ggplot(data = dff, aes(x = drop1_chosen, y = x = reorder(city, -drop1_chosen))) +
+    geom_bar()+ labs(y = "", x = (paste('Cost of', drop1_chosen))
 }
 
-### PLOT 2 FUNCTION ###
+### PLOT 2 FUNCTION IN PYTHON###
 def plot_altair2(dff, drop_a, drop_b):
   chart = alt.Chart(dff).mark_circle().encode(
     x= alt.X(drop_a, axis=alt.Axis(format='$.0f')),
@@ -65,7 +66,7 @@ def plot_altair2(dff, drop_a, drop_b):
   ).configure_axis(labelFontSize = 16, titleFontSize=20)
 return chart.to_html()
 
-### PLOT 3 FUNCTION ###
+### PLOT 3 FUNCTION IN PYTHON###
 def plot_altair3(dff, drop_a, drop_b):  
   chart = alt.Chart(dff).mark_bar().encode(
     x = alt.X(drop_a, axis=alt.Axis(format='$.0f', title = None)),
@@ -77,17 +78,15 @@ return chart.to_html()
 #------------------------------------------------------------------------------
 app <- Dash$new(external_stylesheets = dbcThemes$BOOTSTRAP)
 
-app.layout = dbc.Container([
-  dbc.Row([
-    dbc.Col([
+app.layout = dbc.Container([dbc.Row([dbc.Col([
       dbc.Card(
-        dbc.CardBody([html.H1('Where do you want to live?', style = style_H1), 
-                      html.H3('Cost of Living Dashboard', style = style_H2)]),
+        dbc.CardBody([htmlH1('Where do you want to live?', style = style_H1), 
+                      htmlH3('Cost of Living Dashboard', style = style_H2)]),
         color = colors['background']),
-      html.Br(),
+      htmlBr(),
       
       ### CHECKLIST ###
-      html.H3("Select the Province: ", style = style_H3_c),
+      htmlH3("Select the Province: ", style = style_H3_c),
       dcc.Checklist(
         id='prov_checklist',                
         options=[{'label': 'Select all', 'value': 'all', 'disabled':False}] +
@@ -101,10 +100,10 @@ app.layout = dbc.Container([
         labelClassName='my_box_label', 
         inputStyle={"margin-right": "3px", "margin-left":"20px"},         
       ),
-      html.Br(),
+      htmlBr(),
       
       ### SLIDER ###
-      html.H3("Select City Population: ", style = style_H3_c),
+      htmlH3("Select City Population: ", style = style_H3_c),
       dcc.RangeSlider(id="population", min=0, max=2800000, step = 1000, 
                       marks={100000: '100k',
                         500000: '500k',
@@ -119,7 +118,7 @@ app.layout = dbc.Container([
     ### PLOT 1 LAYOUT###    
     dbc.Col([
       dbc.Col([
-        html.H3('Rank Cities by', style = style_H3), 
+        htmlH3('Rank Cities by', style = style_H3), 
         ### DROPDOWN 1 ###
         dcc.Dropdown(
           id='drop1',
@@ -128,45 +127,45 @@ app.layout = dbc.Container([
           options=[{'label': col, 'value': col} for col in df.columns[2:55]], # only including actual variables
           style = style_dropdown)], 
         style = {'display': 'flex'}),
-      html.Iframe(
+      htmlIframe(
         id='plot1',
         style = style_plot1)], 
       style={"height": "10%"}),
     
     ### PLOT 2  LAYOUT ###
     dbc.Col([
-      dbc.Col([html.H3('Compare ', style = {'color': colors['H3']}),
+      dbc.Col([htmlH3('Compare ', style = {'color': colors['H3']}),
                dcc.Dropdown(
                  id='drop2_a',
                  value='meal_cheap', 
                  options=[{'label': col, 'value': col} for col in df.columns[2:55]], 
                  style = style_dropdown),
-               html.H3('and ', style  = {'color': colors['H3']}),
+               htmlH3('and ', style  = {'color': colors['H3']}),
                dcc.Dropdown(
                  id='drop2_b',
                  value='meal_mid', 
                  options=[{'label': col, 'value': col} for col in df.columns[2:55]], 
                  style =style_dropdown)], 
               style={'display':'flex'}),
-      html.Iframe(
+      htmlIframe(
         id='plot2',
         style = style_plot2),
-      html.Br(),
+      htmlBr(),
       
       ### PLOT 3 LAYOUT ###
-      dbc.Col([html.H3('Compare', style = style_H3),
+      dbc.Col([htmlH3('Compare', style = style_H3),
                dcc.Dropdown(
                  id='drop3_a',
                  value='meal_mid', 
                  options=[{'label': col, 'value': col} for col in df.columns[2:55]], 
                  style=style_dropdown),
-               html.H3('among Cities', style = style_H3),
+               htmlH3('among Cities', style = style_H3),
                dcc.Dropdown(
                  id='drop3_b',
                  value=['Vancouver', 'Toronto'], 
                  options=[{'label': cities, 'value': cities} for cities in df['city']], multi = True)],
               style={'width': '100%', 'font-family': 'arial', "font-size": "1.1em", 'font-weight': 'bold'}),
-      html.Iframe(
+      htmlIframe(
         id='plot3',
         style=style_plot3)
     ])
