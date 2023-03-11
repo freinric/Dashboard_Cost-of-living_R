@@ -14,28 +14,28 @@ data <- read.csv("data_extra.csv", header = TRUE, sep = ",")
 
 # Styles
 
-colors <- c('background'='dark',
+colors <- list('background'='dark',
   'background_dropdown'='#DDDDDD',
   'H1'='#00BBFF',
   'H2'='#7FDBFF',
   'H3'='#005AB5')  # changed from Python dict to R dict with c('key'='value')
 
-style_dropdown <- c('width'='100%', 'font-family'='arial', 
+style_dropdown <- list('width'='100%', 'font-family'='arial', 
                     "font-size"="1.1em", 
                     "background-color"=colors['background_dropdown'], 
                     'font-weight'='bold') # changed from Python dict to R dict with c('key'='value')
 
-style_H1 <- c('textAlign'= 'center', 'color'= colors['H1']) # Title
-style_H2 <- c('textAlign'= 'center', 'color'= colors['H2']) # Subtitle
-style_H3_c <- c('textAlign'='center', 'color'=colors['H3'], 
+style_H1 <- list('textAlign'= 'center', 'color'= colors['H1']) # Title
+style_H2 <- list('textAlign'= 'center', 'color'= colors['H2']) # Subtitle
+style_H3_c <- list('textAlign'='center', 'color'=colors['H3'], 
                'width'='100%') # For card
-style_H3 <- c('color'=colors['H3'], 'width'='100%') # For Charts Title
+style_H3 <- list('color'=colors['H3'], 'width'='100%') # For Charts Title
 
-style_plot1 <- c('border-width'= '0', 'width'='100%', 'height'='970px')
-style_plot2 <- c('border-width'='0', 'width'= '100%', 'height'= '400px')
-style_plot3 <- c('border-width'='0', 'width'='100%', 'height'='400px')
+style_plot1 <- list('border-width'= '0', 'width'='100%', 'height'='970px')
+style_plot2 <- list('border-width'='0', 'width'= '100%', 'height'= '400px')
+style_plot3 <- list('border-width'='0', 'width'='100%', 'height'='400px')
 
-style_card <- c('border'='1px solid #d3d3d3', 'border-radius'='10px')
+style_card <- list('border'='1px solid #d3d3d3', 'border-radius'='10px')
 
 
 #------------------------------------------------------------------------------
@@ -105,15 +105,15 @@ app$layout = dbcContainer(dbcRow(dbcCol(
       
       ### SLIDER ###
       htmlH3("Select City Population: ", style = style_H3_c),
-      dcc.RangeSlider(id="population", min=0, max=2800000, step = 1000, 
-                      marks={100000: '100k',
-                        500000: '500k',
-                        1000000: '1M',
-                        1500000: '1.5M',
-                        2000000: '2M',
-                        2500000: '2.5M',
-                        3000000: '3M'},
-                      value=[0,2800000])], 
+      dccRangeSlider(id="population", min=0, max=2800000, step = 1000, 
+                      marks= list(100000='100k',
+                        500000= '500k',
+                        1000000='1M',
+                        1500000='1.5M',
+                        2000000= '2M',
+                        2500000='2.5M',
+                        3000000='3M'),
+                      value=list(0,2800000))), 
       md = 3, style = style_card),
     
     ### PLOT 1 LAYOUT###    
