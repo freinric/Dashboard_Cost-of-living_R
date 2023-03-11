@@ -1,5 +1,6 @@
 library(dash)
 library(dashHtmlComponents)
+#library(dashBootstrapComponents)
 library(ggplot2)
 library(plotly)
 
@@ -54,8 +55,8 @@ return barchart.to_html()
 # plot 1 in R
 plot_1 <- function(dff, drop1_chosen){
   barchart <- ggplot(data = dff, aes(x = drop1_chosen, y = x = reorder(city, -drop1_chosen))) +
-    geom_bar()+ labs(y = "", x = (paste('Cost of', drop1_chosen))
-}
+    geom_bar()+ labs(y = "", x = (paste('Cost of', drop1_chosen)))
+  return(htmlTable(barchart))}
 
 ### PLOT 2 FUNCTION IN PYTHON###
 def plot_altair2(dff, drop_a, drop_b):
@@ -78,16 +79,16 @@ return chart.to_html()
 #------------------------------------------------------------------------------
 app <- Dash$new(external_stylesheets = dbcThemes$BOOTSTRAP)
 
-app.layout = dbc.Container([dbc.Row([dbc.Col([
-      dbc.Card(
-        dbc.CardBody([htmlH1('Where do you want to live?', style = style_H1), 
-                      htmlH3('Cost of Living Dashboard', style = style_H2)]),
+app$layout = dbcContainer(dbcRow(dbcCol(
+      dbcCard(
+        dbcCardBody(htmlH1('Where do you want to live?', style = style_H1), 
+                      htmlH3('Cost of Living Dashboard', style = style_H2)),
         color = colors['background']),
       htmlBr(),
       
       ### CHECKLIST ###
       htmlH3("Select the Province: ", style = style_H3_c),
-      dcc.Checklist(
+      dccChecklist(
         id='prov_checklist',                
         options=[{'label': 'Select all', 'value': 'all', 'disabled':False}] +
           [{'label': x, 'value': x, 'disabled':False}
