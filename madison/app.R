@@ -43,35 +43,22 @@ style_card <- list('border'='1px solid #d3d3d3', 'border-radius'='10px')
 # Plotting Functions
 
 #------------------------------------------------------------------------------
-### PLOT 1 FUNCTION IN PYTHON ###
-def plot_altair1(dff, drop1_chosen):
-  barchart = alt.Chart(dff[-pd.isnull(dff[drop1_chosen])]).mark_bar().encode(
-    alt.X(drop1_chosen, title='Cost of '+drop1_chosen, axis=alt.Axis(orient='top',format='$.0f')),
-    alt.Y('city', sort='x', title=""),
-    tooltip=[drop1_chosen,'province']).configure_axis(labelFontSize = 16, titleFontSize=20)
-return barchart.to_html()
 
 # plot 1 in R
 plot_1 <- function(dff, drop1_chosen){
   barchart <- ggplot(data = dff, aes(x = drop1_chosen, y = reorder(city, -drop1_chosen))) +
-    geom_bar()+ labs(y = "", x = (paste('Cost of', drop1_chosen)))
-  return(htmlTable(barchart))}
-
-### PLOT 2 FUNCTION IN PYTHON###
-def plot_altair2(dff, drop_a, drop_b):
-  chart = alt.Chart(dff).mark_circle().encode(
-    x= alt.X(drop_a, axis=alt.Axis(format='$.0f')),
-    y=alt.Y(drop_b, axis=alt.Axis(format='$.0f')),
-    tooltip=['city', drop_a, drop_b]
-  ).configure_axis(labelFontSize = 16, titleFontSize=20)
-return chart.to_html()
+    geom_bar()+ labs(y = "", x = (paste('Cost of', drop1_chosen))) + 
+    scale_x_continuous(labels=scales::dollar_format())
+  barchart1 = ggplotly(barchart + aes(text = list(drop1_chosen, 'province')), tooltip = 'text')
+  return(htmlTable(barchart1))}
 
 # plot 2 in R
 plot_2 <- function(dff, drop_a, drop_b){
   chart = ggplot(data = dff, aes(x = drop_a, y = drop_b)) + geom_point() + 
     scale_y_continuous(labels=scales::dollar_format()) + 
     scale_x_continuous(labels=scales::dollar_format())
-  return(htmlTable(chart))
+  chart1 = ggplotly(chart + aes(text = list('city', drop_a, drop_b)), tooltip = 'text')
+  return(htmlTable(chart1))
 }
 
 ### PLOT 3 FUNCTION IN PYTHON###
@@ -83,13 +70,26 @@ def plot_altair3(dff, drop_a, drop_b):
   ).configure_axis(labelFontSize = 16)
 return chart.to_html()
 
+# plot 3 in R
+plot_3 <- function(dff, drop_a, drop_b){
+  ch = ggplot(data = dff, aes(x = drop_a, y = reorder('city', -drop_a))) + geom_bar() + 
+    labs(x = '', y = "") + 
+    scale_x_continuous(labels=scales::dollar_format())
+  # what is the purpose of transform_filter above???? that's the only thing missing from fn
+  return(htmlTable(ch))
+  
+}
+
+
 #------------------------------------------------------------------------------
 
 app <- Dash$new(external_stylesheets = dbcThemes$BOOTSTRAP)
 
-app$layout = dbcContainer(dbcRow(dbcCol(
-      dbcCard(
-        dbcCardBody(htmlH1('Where do you want to live?', style = style_H1), 
+app$layout = dbcContainer(
+  dbcRow(
+    list(
+      dbcCol(
+        dbcCard(dbcCardBody(htmlH1('Where do you want to live?', style = style_H1), 
                       htmlH3('Cost of Living Dashboard', style = style_H2)),
         color = colors['background']),
       htmlBr(),
@@ -97,16 +97,14 @@ app$layout = dbcContainer(dbcRow(dbcCol(
       ### CHECKLIST ###
       htmlH3("Select the Province: ", style = style_H3_c),
       dccChecklist(id='prov_checklist',                
-        options=[{'label': 'Select all', 'value': 'all', 'disabled':False}] +
-          [{'label': x, 'value': x, 'disabled':False}
-           for x in provs],
-        value=['all'],    # values chosen by default
+        options=list('label'='Select all', 'value'='all', 'disabled'= False),
+        value=list('all'),    # values chosen by default
         
         ### STYLES IN CHECKLIST ###
         className='my_box_container', 
         inputClassName='my_box_input',         
         labelClassName='my_box_label', 
-        inputStyle={"margin-right": "3px", "margin-left":"20px"},         
+        inputStyle=list("margin-right"="3px", "margin-left"="20px"),         
       ),
       htmlBr(),
       
