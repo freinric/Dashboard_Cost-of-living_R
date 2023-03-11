@@ -3,6 +3,7 @@ library(dashHtmlComponents)
 #library(dashBootstrapComponents)
 library(ggplot2)
 library(plotly)
+library(scales)
 
 
 # Defining Things
@@ -13,7 +14,6 @@ library(plotly)
 data <- read.csv("data_extra.csv", header = TRUE, sep = ",")
 
 # Styles
-
 colors <- list('background'='dark',
   'background_dropdown'='#DDDDDD',
   'H1'='#00BBFF',
@@ -37,7 +37,6 @@ style_plot3 <- list('border-width'='0', 'width'='100%', 'height'='400px')
 
 style_card <- list('border'='1px solid #d3d3d3', 'border-radius'='10px')
 
-
 #------------------------------------------------------------------------------
 
 
@@ -54,7 +53,7 @@ return barchart.to_html()
 
 # plot 1 in R
 plot_1 <- function(dff, drop1_chosen){
-  barchart <- ggplot(data = dff, aes(x = drop1_chosen, y = x = reorder(city, -drop1_chosen))) +
+  barchart <- ggplot(data = dff, aes(x = drop1_chosen, y = reorder(city, -drop1_chosen))) +
     geom_bar()+ labs(y = "", x = (paste('Cost of', drop1_chosen)))
   return(htmlTable(barchart))}
 
@@ -67,6 +66,14 @@ def plot_altair2(dff, drop_a, drop_b):
   ).configure_axis(labelFontSize = 16, titleFontSize=20)
 return chart.to_html()
 
+# plot 2 in R
+plot_2 <- function(dff, drop_a, drop_b){
+  chart = ggplot(data = dff, aes(x = drop_a, y = drop_b)) + geom_point() + 
+    scale_y_continuous(labels=scales::dollar_format()) + 
+    scale_x_continuous(labels=scales::dollar_format())
+  return(htmlTable(chart))
+}
+
 ### PLOT 3 FUNCTION IN PYTHON###
 def plot_altair3(dff, drop_a, drop_b):  
   chart = alt.Chart(dff).mark_bar().encode(
@@ -77,6 +84,7 @@ def plot_altair3(dff, drop_a, drop_b):
 return chart.to_html()
 
 #------------------------------------------------------------------------------
+
 app <- Dash$new(external_stylesheets = dbcThemes$BOOTSTRAP)
 
 app$layout = dbcContainer(dbcRow(dbcCol(
@@ -88,8 +96,7 @@ app$layout = dbcContainer(dbcRow(dbcCol(
       
       ### CHECKLIST ###
       htmlH3("Select the Province: ", style = style_H3_c),
-      dccChecklist(
-        id='prov_checklist',                
+      dccChecklist(id='prov_checklist',                
         options=[{'label': 'Select all', 'value': 'all', 'disabled':False}] +
           [{'label': x, 'value': x, 'disabled':False}
            for x in provs],
@@ -117,11 +124,11 @@ app$layout = dbcContainer(dbcRow(dbcCol(
       md = 3, style = style_card),
     
     ### PLOT 1 LAYOUT###    
-    dbc.Col([
-      dbc.Col([
+    dbcCol([
+      dbcCol([
         htmlH3('Rank Cities by', style = style_H3), 
         ### DROPDOWN 1 ###
-        dcc.Dropdown(
+        dccDropdown(
           id='drop1',
           placeholder="Variables",
           value='meal_cheap',  
@@ -134,15 +141,15 @@ app$layout = dbcContainer(dbcRow(dbcCol(
       style={"height": "10%"}),
     
     ### PLOT 2  LAYOUT ###
-    dbc.Col([
-      dbc.Col([htmlH3('Compare ', style = {'color': colors['H3']}),
-               dcc.Dropdown(
+    dbcCol([
+      dbcCol([htmlH3('Compare ', style = {'color': colors['H3']}),
+               dccDropdown(
                  id='drop2_a',
                  value='meal_cheap', 
                  options=[{'label': col, 'value': col} for col in df.columns[2:55]], 
                  style = style_dropdown),
                htmlH3('and ', style  = {'color': colors['H3']}),
-               dcc.Dropdown(
+               dccDropdown(
                  id='drop2_b',
                  value='meal_mid', 
                  options=[{'label': col, 'value': col} for col in df.columns[2:55]], 
@@ -154,8 +161,8 @@ app$layout = dbcContainer(dbcRow(dbcCol(
       htmlBr(),
       
       ### PLOT 3 LAYOUT ###
-      dbc.Col([htmlH3('Compare', style = style_H3),
-               dcc.Dropdown(
+      dbcCol([htmlH3('Compare', style = style_H3),
+               dccDropdown(
                  id='drop3_a',
                  value='meal_mid', 
                  options=[{'label': col, 'value': col} for col in df.columns[2:55]], 
@@ -163,7 +170,7 @@ app$layout = dbcContainer(dbcRow(dbcCol(
                htmlH3('among Cities', style = style_H3),
                dcc.Dropdown(
                  id='drop3_b',
-                 value=['Vancouver', 'Toronto'], 
+                 value=list('Vancouver', 'Toronto'), 
                  options=[{'label': cities, 'value': cities} for cities in df['city']], multi = True)],
               style={'width': '100%', 'font-family': 'arial', "font-size": "1.1em", 'font-weight': 'bold'}),
       htmlIframe(
