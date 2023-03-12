@@ -46,7 +46,7 @@ barplot <- function(drop1="meal_cheap") {
 plot3 <- function(drop3a="meal_cheap", drop3b=list("Edmonton", "Kelowna")) {
   dff <- df %>% dplyr::filter(city %in% drop3b)
   plot3 <- dff %>% 
-    ggplot(aes(x=!!sym(drop3a), y=city)) +
+    ggplot(aes(x=!!sym(drop3a), y=reorder(city, -!!sym(drop3a)))) +
     geom_col() + 
     theme_bw(20) +
     labs(y='', x=drop3a)
@@ -137,7 +137,7 @@ drop3b <- dccDropdown(
     df$city, function(x){
       list(label=x, value=x)
     }),
-  value = 'Edmonton',
+  value = list('Edmonton', 'Kelowna'),
   multi = TRUE
 )
 
@@ -237,13 +237,22 @@ app$callback(
 ### PLOT 2 ###
 app$callback(
   output(id = 'scatter_plot', property = 'figure'),
-
   params=list(input(id='drop2a', property = 'value'),
               input(id='drop2b', property = 'value')),
-
-  # Update the histplot
   function(drop2a, drop2b) {
     scatterplot(drop2a, drop2b)
+  }
+)
+
+### PLOT 3 ###
+app$callback(
+  output(id = 'plot3', property = 'figure'),
+
+  params=list(input(id='drop3a', property = 'value'),
+              input(id='drop3b', property = 'value')),
+
+  function(drop3a, drop3b) {
+    plot3(drop3a, drop3b)
   }
 )
 
