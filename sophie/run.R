@@ -96,10 +96,10 @@ plot_3 <- function(dff, drop_a, drop_b){
 
 app <- Dash$new(external_stylesheets = dbcThemes$BOOTSTRAP)
 
-app$layout = dbcContainer(
+app$layout(dbcContainer(
   dbcRow(
     list(
-      dbcCol(
+      dbcCol(list(
         dbcCard(dbcCardBody(htmlH1('Where do you want to live?', style = style_H1), 
                             htmlH3('Cost of Living Dashboard', style = style_H2)),
                 color = colors['background']),
@@ -121,11 +121,12 @@ app$layout = dbcContainer(
         
         ### SLIDER ###
         htmlH3("Select City Population: ", style = style_H3_c),
-        dccRangeSlider(id="population", min=0, max=2800000, step = 1000, 
-                       marks= append(as.list(setNames(c(100000,500000), paste0(as.character(c(100000,500000)/1000), "k"))), 
-                                     as.list(setNames(c(1000000, 1500000, 2000000, 2500000, 3000000), paste0(as.character(c(1000000, 1500000, 2000000, 2500000, 3000000)/1000000), "M")))),
-                       value=list(0,2800000))), 
-      md = 3, style = style_card),
+        dccRangeSlider(list(id="population", min= 0, max= 2800000, step = 1000,
+                            marks= append(as.list(setNames(paste0(as.character(c(100000,500000)/1000), "k"), c(100000,500000))),
+                                          as.list(setNames(paste0(as.character(c(1000000, 1500000, 2000000, 2500000, 3000000)/1000000), "M"), c(1000000, 1500000, 2000000, 2500000, 3000000)))),
+                      
+                       value=list(0,2800000)))),
+      md = 3, style = style_card)),
     
     ### PLOT 1 LAYOUT###    
     dbcCol(list(
@@ -185,8 +186,9 @@ app$layout = dbcContainer(
     )
     )
   )
-
+)
 #------------------------------------------------------------------------------
 
 
 app$run_server(debug = T)
+
