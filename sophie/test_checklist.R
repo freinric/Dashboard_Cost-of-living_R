@@ -13,10 +13,10 @@ provs = as.list(unique(data['province']))
 app <- Dash$new()
 app$layout(
   dccChecklist(id='prov_checklist',                
-               options = list("all", list(map(
-                 names(provs), function(x){
-                   list(label=x, value=x)
-                 }))),
+               options = map(
+                 append("all",provs$province), function(x){
+                   list('label'=x, 'value'=x)
+                 }),
                value=list('all'),    # values chosen by default
                
                ### STYLES IN CHECKLIST ###
