@@ -20,24 +20,12 @@ df <- read.csv("ricky/data_extra.csv", header = TRUE, sep = ",")
 options(repr.plot.width = 10, repr.plot.height = 10)
 
 ### FUNCTIONS ###
-histplot <- function(xaxis="meal_cheap", num_bins=3) { 
-  
-  # Make the histogram object, assign it to 'hist'
-  hist <- ggplot(data = df, aes(x=!!sym(xaxis))) +
-    geom_histogram(bins = as.integer(num_bins)) +
-    labs(y = "Number of cities", x = xaxis) +
-    theme_bw(20)
-  
-  # Return the ggplot object
-  ggplotly(hist)
-}
 
 scatterplot <- function(xaxis="meal_cheap", yaxis="meal_cheap") {
   #Return the ggplot
   scatter_plot <- df %>% 
     ggplot(aes(x= !!sym(xaxis), y = !!sym(yaxis))) +
     geom_point() + 
-    geom_smooth(se=FALSE) +
     theme_bw(20) +
     labs(y=yaxis, x=xaxis)
   
@@ -45,16 +33,15 @@ scatterplot <- function(xaxis="meal_cheap", yaxis="meal_cheap") {
            width=500)}
 
 barplot <- function(xaxis="meal_cheap") {
-  
+  options(repr.plot.width = 10, repr.plot.height = 20)
   bar_plot <- df %>% dplyr::filter(!!sym(xaxis) > 0)%>% 
     ggplot(aes(x=!!sym(xaxis), y =reorder(city, -!!sym(xaxis)))) +
     geom_col(position = "dodge") + 
     theme_bw(20) +
     labs(x=xaxis, y="")
   
-  ggplotly(bar_plot) 
+  ggplotly(bar_plot, height = 2000) 
 }
-
 
 
 lineplot <- function(xaxis="meal_cheap", yaxis="meal_cheap") {
@@ -70,10 +57,6 @@ lineplot <- function(xaxis="meal_cheap", yaxis="meal_cheap") {
 
 ### INSTANCES ###
 # Create instance of the histplot function and assign it to 'histogram'
-histogram <- histplot()
-graph_hist <- dccGraph(id='histogram',
-                       figure=histogram,
-                       config = list('displaylogo' = FALSE))
 
 scatter <- scatterplot()
 graph_scatter <- dccGraph(id='scatter_plot',
@@ -167,33 +150,25 @@ app$layout(htmlDiv(list(
           ),
           htmlDiv(list(
             ### TOP TWO PLOTS ###
-              htmlDiv(
-                list( 
-                  htmlDiv(
-                    list(
-                      graph_hist
-                    ), style=list('width'='100%')
-                  ),
-                  htmlDiv(
-                    list(
-                      graph_scatter
-                    ), style=list('width'='100%')
-                  )
-                ), style = list('display'='flex')
-              ),
-              ### BOTTOM TWO PLOTS ###
-              htmlDiv(
-                list( 
+              htmlDiv( ## beside each other
+                list(
                   htmlDiv(
                     list(
                       graph_bar
                     ), style=list('width'='100%')
                   ),
-                  htmlDiv(
-                    list(
-                      graph_line
-                    ), style=list('width'='100%')
-                  )
+                  
+                  htmlDiv(list(
+                    htmlDiv(
+                      list(
+                        graph_scatter
+                      ), style=list('width'='100%')
+                    ),
+                    htmlDiv(
+                      list(
+                        graph_line
+                      ), style=list('width'='100%')
+                    )))
                 ), style = list('display'='flex')
               )))
         ), style=list('display'='flex'))
@@ -206,15 +181,14 @@ app$layout(htmlDiv(list(
 app$callback(
 
   # Update the 'figure' property of the object with id 'histogram'
-  output(id = 'histogram', property = 'figure'),
+  output(id = 'bar_plot', property = 'figure'),
 
   # with the 'value' property of the object with id 'xaxis' (the x-axis dropdown)
-  params=list(input(id='xaxis', property = 'value'),
-              input(id='num_bins', property = 'value')),
+  params=list(input(id='xaxis', property = 'value')),
 
   # Update the histplot
-  function(xaxis, num_bins) {
-    histplot(xaxis, num_bins)
+  function(xaxis) {
+    barplot(xaxis)
   }
 )
 
