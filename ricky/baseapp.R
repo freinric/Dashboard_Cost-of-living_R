@@ -1,8 +1,3 @@
-# Layout example for DashR
-# This layout includes two basic plots next to each other, two dropdown boxes, a title bar, and a sidebar
-# Author: Matthew Connell
-# Date: February 2020
-
 library(dash)
 library(dashCoreComponents)
 library(dashHtmlComponents)
@@ -19,45 +14,44 @@ df <- read.csv("ricky/data_extra.csv", header = TRUE, sep = ",")
 # Set plot height and width
 options(repr.plot.width = 10, repr.plot.height = 10)
 
-### FUNCTIONS ###
 
-scatterplot <- function(xaxis="meal_cheap", yaxis="meal_cheap") {
+### PLOT FUNCTIONS ###
+# -----------------------------------------------------------------------
+
+
+barplot <- function(drop1="meal_cheap") {
+  options(repr.plot.width = 10, repr.plot.height = 20)
+  bar_plot <- df %>% dplyr::filter(!!sym(drop1) > 0)%>% 
+    ggplot(aes(x=!!sym(drop1), y =reorder(city, -!!sym(drop1)), text = city)) +
+    geom_col(position = "dodge") + 
+    theme_bw(20) +
+    labs(x=drop1, y="")
+  ggplotly(bar_plot, height = 2000, width = 700) 
+}
+
+scatterplot <- function(drop2a="meal_cheap", drop2b="meal_mid") {
   #Return the ggplot
   scatter_plot <- df %>% 
-    ggplot(aes(x= !!sym(xaxis), y = !!sym(yaxis))) +
+    ggplot(aes(x= !!sym(drop2a), y = !!sym(drop2b), text = paste("City:", city))) +
     geom_point() + 
     theme_bw(20) +
-    labs(y=yaxis, x=xaxis)
-  
+    labs(y=drop2b, x=drop2a)
   ggplotly(scatter_plot,
            width=500)}
 
-barplot <- function(xaxis="meal_cheap") {
-  options(repr.plot.width = 10, repr.plot.height = 20)
-  bar_plot <- df %>% dplyr::filter(!!sym(xaxis) > 0)%>% 
-    ggplot(aes(x=!!sym(xaxis), y =reorder(city, -!!sym(xaxis)))) +
-    geom_col(position = "dodge") + 
+plot3 <- function(drop3a="meal_cheap", drop3b=list("Edmonton", "Kelowna")) {
+  dff <- df %>% dplyr::filter(city %in% drop3b)
+  plot3 <- dff %>% 
+    ggplot(aes(x=!!sym(drop3a), y=reorder(city, -!!sym(drop3a)))) +
+    geom_col() + 
     theme_bw(20) +
-    labs(x=xaxis, y="")
+    labs(y='', x=drop3a)
   
-  ggplotly(bar_plot, height = 2000) 
+  ggplotly(plot3, width = 700)
 }
 
-
-lineplot <- function(xaxis="meal_cheap", yaxis="meal_cheap") {
-  
-  line_plot <- df %>% 
-    ggplot(aes(x=!!sym(xaxis), y=!!sym(yaxis))) +
-    geom_line() + 
-    theme_bw(20) +
-    labs(y=yaxis, x=xaxis)
-  
-  ggplotly(line_plot) %>% layout(showlegend = FALSE)
-}
 
 ### INSTANCES ###
-# Create instance of the histplot function and assign it to 'histogram'
-
 scatter <- scatterplot()
 graph_scatter <- dccGraph(id='scatter_plot',
                           figure=scatter,
@@ -68,33 +62,62 @@ graph_bar <- dccGraph(id='bar_plot',
                       figure=bar,
                       config = list('displaylogo' = FALSE))
 
-line <- lineplot()
-graph_line <- dccGraph(id='line_plot',
-                       figure=line,
+bar2 <- plot3()
+graph_bar2 <- dccGraph(id='plot3',
+                       figure=bar2,
                        config = list('displaylogo' = FALSE))
 
-# Create a dropdown box for the xaxis
-xaxis <- dccDropdown(
-  id = "xaxis",
-  # Set the options for the dropdown (all the columns of the df)
+# -----------------------------------------------------------------------
+### DROPDOWNS ###
+
+drop1 <- dccDropdown(
+  id = "drop1",
   options = map(
-    names(df), function(x){
+    names(df)[3:57], function(x){
       list(label=x, value=x)
     }),
-  
-  # Assign a default value for the dropdown
   value = 'meal_cheap'
 )
 
-# Do the same for the y-axis
-yaxis <- dccDropdown(
-  id = "yaxis",
+drop2a <- dccDropdown(
+  id = "drop2a",
   options = map(
-    names(df), function(x){
+    names(df)[3:57], function(x){
       list(label=x, value=x)
     }),
   value = 'meal_cheap'
 )
+
+drop2b <- dccDropdown(
+  id = "drop2b",
+  options = map(
+    names(df)[3:57], function(x){
+      list(label=x, value=x)
+    }),
+  value = 'meal_mid'
+)
+
+drop3a <- dccDropdown(
+  id = "drop3a",
+  options = map(
+    names(df)[3:57], function(x){
+      list(label=x, value=x)
+    }),
+  value = 'meal_mid'
+)
+
+drop3b <- dccDropdown(
+  id = "drop3b",
+  options = map(
+    df$city, function(x){
+      list(label=x, value=x)
+    }),
+  value = list('Edmonton', 'Kelowna'),
+  multi = TRUE
+)
+
+
+# -----------------------------------------------------------------------
 
 ### THIS PART DOESN'T WORK ###
 # Create a slider for number of bins
@@ -117,94 +140,90 @@ num_bins <- dccSlider(
 
 # Start the layout
 app$layout(htmlDiv(list(
-  # TITLE BAR
-  htmlDiv(
-    list(
-      htmlH1("City test")
-    ), style = list('columnCount'=1, 
-                    'background-color'= 'black', 
-                    'color'='white',
-                    'text-align'='center')
-  ),
-  # SIDEBAR
+  
   htmlDiv(list(
     htmlDiv(
         list(
+          # SIDEBAR
           htmlDiv(
             list(
-              # Dropdowns
-              htmlP("Select a variable for the x-axis:"),
-              xaxis,
-              # Use htmlBr() for line breaks
+              htmlH1("Where do you want to live?"),
+              htmlH2("Cost of Living Dashboard"),
               htmlBr(),
-              htmlP("Select a variable for the y-axis:"),
-              yaxis,
-              htmlP("Choose the number of bins for your histogram:"),
-              num_bins,
+              htmlH3("Select Provinces"),
+              htmlP('checkboxes'),
               htmlBr(),
-              htmlP("placeholder text")
+              htmlH3('Select City Population'),
+              htmlP("slider")
             ), style = list('background-color'='lightgrey', 
                             'columnCount'=1, 
                             'white-space'='pre-line',
                             'width' = '300px')
           ),
-          htmlDiv(list(
-            ### TOP TWO PLOTS ###
-              htmlDiv( ## beside each other
+          htmlDiv(
+            list(
+              htmlDiv(
                 list(
-                  htmlDiv(
-                    list(
+                  htmlDiv( # PLOT 1 #
+                    list(htmlH2('Rank Cities by:'), drop1,
                       graph_bar
                     ), style=list('width'='100%')
                   ),
                   
-                  htmlDiv(list(
-                    htmlDiv(
-                      list(
-                        graph_scatter
-                      ), style=list('width'='100%')
-                    ),
-                    htmlDiv(
-                      list(
-                        graph_line
-                      ), style=list('width'='100%')
-                    )))
+                  htmlDiv(
+                    list(
+                      htmlDiv( # PLOT 2 #
+                        list(htmlH2('Compare'), drop2a, 
+                             htmlH2('and'),drop2b,
+                          graph_scatter
+                        ), style=list('width'='100%')
+                      ),
+                      htmlDiv( # PLOT 3 #
+                        list(htmlH2('Compare'), drop3a, 
+                             htmlH2('among cities:'),drop3b,
+                          graph_bar2
+                        ), style=list('width'='100%')
+                      )))
                 ), style = list('display'='flex')
               )))
         ), style=list('display'='flex'))
     ), style = list('display'='flex')
   ))))
 
+# -----------------------------------------------------------------------
+### CALLBACKS
 
-
-# app$callback is what allows the graphs to update after the user changes the slider or dropdown
+### BARPLOT1 ###
 app$callback(
-
-  # Update the 'figure' property of the object with id 'histogram'
   output(id = 'bar_plot', property = 'figure'),
-
-  # with the 'value' property of the object with id 'xaxis' (the x-axis dropdown)
-  params=list(input(id='xaxis', property = 'value')),
-
-  # Update the histplot
-  function(xaxis) {
-    barplot(xaxis)
+  params=list(input(id='drop1', property = 'value')),
+  function(drop1) {
+    barplot(drop1)
   }
 )
 
-
+### PLOT 2 ###
 app$callback(
-
-  # Update the 'figure' property of the object with id 'scatter'
   output(id = 'scatter_plot', property = 'figure'),
-
-  params=list(input(id='xaxis', property = 'value'),
-              input(id='yaxis', property = 'value')),
-
-  # Update the histplot
-  function(xaxis, yaxis) {
-    scatterplot(xaxis, yaxis)
+  params=list(input(id='drop2a', property = 'value'),
+              input(id='drop2b', property = 'value')),
+  function(drop2a, drop2b) {
+    scatterplot(drop2a, drop2b)
   }
 )
+
+### PLOT 3 ###
+app$callback(
+  output(id = 'plot3', property = 'figure'),
+
+  params=list(input(id='drop3a', property = 'value'),
+              input(id='drop3b', property = 'value')),
+
+  function(drop3a, drop3b) {
+    plot3(drop3a, drop3b)
+  }
+)
+
+
 
 app$run_server(debug = T)
