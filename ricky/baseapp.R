@@ -14,7 +14,6 @@ library(dplyr)
 # Set an external stylesheet for CSS
 app <- Dash$new(external_stylesheets = "https://codepen.io/chriddyp/pen/bWLwgP.css")
 
-# Use built-in mtcars dataset
 df <- read.csv("ricky/data_extra.csv", header = TRUE, sep = ",")
 
 # Set plot height and width
@@ -45,16 +44,17 @@ scatterplot <- function(xaxis="meal_cheap", yaxis="meal_cheap") {
   ggplotly(scatter_plot,
            width=500)}
 
-barplot <- function(xaxis="meal_cheap", yaxis="meal_cheap") {
+barplot <- function(xaxis="meal_cheap") {
   
-  bar_plot <- df %>% 
-    ggplot(aes(x=!!sym(xaxis), y =!!sym(yaxis))) +
+  bar_plot <- df %>% dplyr::filter(!!sym(xaxis) > 0)%>% 
+    ggplot(aes(x=!!sym(xaxis), y =reorder(city, -!!sym(xaxis)))) +
     geom_col(position = "dodge") + 
     theme_bw(20) +
-    labs(y=yaxis, x=xaxis)
+    labs(x=xaxis, y="")
   
   ggplotly(bar_plot) 
 }
+
 
 
 lineplot <- function(xaxis="meal_cheap", yaxis="meal_cheap") {
