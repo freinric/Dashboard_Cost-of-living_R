@@ -22,11 +22,11 @@ options(repr.plot.width = 10, repr.plot.height = 10)
 barplot <- function(drop1="meal_cheap") {
   options(repr.plot.width = 10, repr.plot.height = 20)
   bar_plot <- df %>% dplyr::filter(!!sym(drop1) > 0)%>% 
-    ggplot(aes(x=!!sym(drop1), y =reorder(city, -!!sym(drop1)), text = city)) +
+    ggplot(aes(x=!!sym(drop1), y =reorder(city, -!!sym(drop1)), text = paste("City:", city))) +
     geom_col(position = "dodge") + 
     theme_bw(20) +
     labs(x=drop1, y="")
-  ggplotly(bar_plot, height = 2000, width = 700) 
+  ggplotly(bar_plot, height = 2000, width = 700, tooltip = c("text", "x")) 
 }
 
 scatterplot <- function(drop2a="meal_cheap", drop2b="meal_mid") {
@@ -47,7 +47,7 @@ plot3 <- function(drop3a="meal_cheap", drop3b=list("Edmonton", "Kelowna")) {
     theme_bw(20) +
     labs(y='', x=drop3a)
   
-  ggplotly(plot3, width = 700)
+  ggplotly(plot3, width = 700, tooltip = c("x"))
 }
 
 
