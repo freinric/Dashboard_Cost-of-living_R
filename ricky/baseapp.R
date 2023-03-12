@@ -1,8 +1,3 @@
-# Layout example for DashR
-# This layout includes two basic plots next to each other, two dropdown boxes, a title bar, and a sidebar
-# Author: Matthew Connell
-# Date: February 2020
-
 library(dash)
 library(dashCoreComponents)
 library(dashHtmlComponents)
@@ -19,29 +14,30 @@ df <- read.csv("ricky/data_extra.csv", header = TRUE, sep = ",")
 # Set plot height and width
 options(repr.plot.width = 10, repr.plot.height = 10)
 
-### FUNCTIONS ###
 
+### PLOT FUNCTIONS ###
 # -----------------------------------------------------------------------
-scatterplot <- function(drop2a="meal_cheap", drop2b="meal_mid") {
-  #Return the ggplot
-  scatter_plot <- df %>% 
-    ggplot(aes(x= !!sym(drop2a), y = !!sym(drop2b))) +
-    geom_point() + 
-    theme_bw(20) +
-    labs(y=drop2b, x=drop2a)
-  ggplotly(scatter_plot,
-           width=500)}
+
 
 barplot <- function(drop1="meal_cheap") {
   options(repr.plot.width = 10, repr.plot.height = 20)
   bar_plot <- df %>% dplyr::filter(!!sym(drop1) > 0)%>% 
-    ggplot(aes(x=!!sym(drop1), y =reorder(city, -!!sym(drop1)))) +
+    ggplot(aes(x=!!sym(drop1), y =reorder(city, -!!sym(drop1)), text = city)) +
     geom_col(position = "dodge") + 
     theme_bw(20) +
     labs(x=drop1, y="")
   ggplotly(bar_plot, height = 2000, width = 700) 
 }
 
+scatterplot <- function(drop2a="meal_cheap", drop2b="meal_mid") {
+  #Return the ggplot
+  scatter_plot <- df %>% 
+    ggplot(aes(x= !!sym(drop2a), y = !!sym(drop2b), text = paste("City:", city))) +
+    geom_point() + 
+    theme_bw(20) +
+    labs(y=drop2b, x=drop2a)
+  ggplotly(scatter_plot,
+           width=500)}
 
 plot3 <- function(drop3a="meal_cheap", drop3b=list("Edmonton", "Kelowna")) {
   dff <- df %>% dplyr::filter(city %in% drop3b)
@@ -56,7 +52,6 @@ plot3 <- function(drop3a="meal_cheap", drop3b=list("Edmonton", "Kelowna")) {
 
 
 ### INSTANCES ###
-
 scatter <- scatterplot()
 graph_scatter <- dccGraph(id='scatter_plot',
                           figure=scatter,
@@ -74,26 +69,6 @@ graph_bar2 <- dccGraph(id='plot3',
 
 # -----------------------------------------------------------------------
 ### DROPDOWNS ###
-xaxis <- dccDropdown(
-  id = "xaxis",
-  # Set the options for the dropdown (all the columns of the df)
-  options = map(
-    names(df), function(x){
-      list(label=x, value=x)
-    }),
-  
-  # Assign a default value for the dropdown
-  value = 'meal_cheap'
-)
-
-yaxis <- dccDropdown(
-  id = "yaxis",
-  options = map(
-    names(df), function(x){
-      list(label=x, value=x)
-    }),
-  value = 'meal_cheap'
-)
 
 drop1 <- dccDropdown(
   id = "drop1",
@@ -165,10 +140,11 @@ num_bins <- dccSlider(
 
 # Start the layout
 app$layout(htmlDiv(list(
-  # SIDEBAR
+  
   htmlDiv(list(
     htmlDiv(
         list(
+          # SIDEBAR
           htmlDiv(
             list(
               htmlH1("Where do you want to live?"),
@@ -184,27 +160,30 @@ app$layout(htmlDiv(list(
                             'white-space'='pre-line',
                             'width' = '300px')
           ),
-          htmlDiv(list(
-            ### TOP TWO PLOTS ###
-              htmlDiv( ## beside each other
+          htmlDiv(
+            list(
+              htmlDiv(
                 list(
-                  htmlDiv(
-                    list(htmlH2('plot 1 title'), drop1,
+                  htmlDiv( # PLOT 1 #
+                    list(htmlH2('Rank Cities by:'), drop1,
                       graph_bar
                     ), style=list('width'='100%')
                   ),
                   
-                  htmlDiv(list(
-                    htmlDiv(
-                      list(htmlH2('plot 2 title'), drop2a, drop2b,
-                        graph_scatter
-                      ), style=list('width'='100%')
-                    ),
-                    htmlDiv(
-                      list(htmlH2('plot 3 title'), drop3a, drop3b,
-                        graph_bar2
-                      ), style=list('width'='100%')
-                    )))
+                  htmlDiv(
+                    list(
+                      htmlDiv( # PLOT 2 #
+                        list(htmlH2('Compare'), drop2a, 
+                             htmlH2('and'),drop2b,
+                          graph_scatter
+                        ), style=list('width'='100%')
+                      ),
+                      htmlDiv( # PLOT 3 #
+                        list(htmlH2('Compare'), drop3a, 
+                             htmlH2('among cities:'),drop3b,
+                          graph_bar2
+                        ), style=list('width'='100%')
+                      )))
                 ), style = list('display'='flex')
               )))
         ), style=list('display'='flex'))
