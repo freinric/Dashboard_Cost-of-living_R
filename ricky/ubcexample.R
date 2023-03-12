@@ -107,7 +107,7 @@ graph_line <- dccGraph(id='line_plot',
 
 
 
-app$layout(list(
+app$layout(htmlDiv(list(
   htmlDiv(
     list(
       htmlH2("Motor Trend Cars")
@@ -115,53 +115,49 @@ app$layout(list(
                     'background-color'= 'lightgrey', 
                     'color'='white')
   ),# Main area, # DROPDOWNS
-  htmlDiv(
-    list(
-      htmlDiv(
-        list(
-          htmlP("Select a variable for the x-axis:"),
-          xaxis,
-          htmlP("Select a variable for the y-axis:"),
-          yaxis
-        )
-      )
-    ), style = list('display'='flex',
-                    'justify-content'='flex-start',
-                    'white-space'='pre-line')
-  ),
-  htmlDiv(
-    list(
-      htmlDiv(
+  htmlDiv(list(htmlDiv(
         list(
           htmlDiv(
             list(
-              graph_hist
-            ), style=list('width'='90%')
-          ),
-          htmlDiv(
-            list(
-              graph_area
-            ), style=list('width'='90%')
+              htmlP("Select a variable for the x-axis:"),
+                       xaxis,
+                       htmlP("Select a variable for the y-axis:"),
+                       yaxis
+              ), style = list('display'='flex',
+                                            'justify-content'='flex-start',
+                                            'white-space'='pre-line')),
+          htmlDiv(list( ### PLOTS ###
+            htmlDiv( ### TOP TWO PLOTS ###
+                list(
+                  htmlDiv(
+                    list(
+                      graph_hist
+                    ), style=list('width'='90%')
+                  ),
+                  htmlDiv(
+                    list(
+                      graph_area
+                    ), style=list('width'='90%')
+                  )
+                ), style = list('display'='flex')
+              ),
+              htmlDiv( ### BOTTOM TWO PLOTS ###
+                list(
+                  htmlDiv(
+                    list(
+                      graph_bar
+                    ), style = list('width' = "90%")
+                  ),
+                  htmlDiv(
+                    list(
+                      graph_line
+                    ), style=list('width'='90%')
+                  )
+                ), style = list('display'='flex')
+              )
+            )
           )
-        ), style = list('display'='flex')
-      ),
-      htmlDiv(
-        list(
-          htmlDiv(
-            list(
-              graph_bar
-            ), style = list('width' = "90%")
-          ),
-          htmlDiv(
-            list(
-              graph_line
-            ), style=list('width'='90%')
-          )
-        ), style = list('display'='flex')
-      )
-    )
-  )
-))
+        )))))))
 
 
 

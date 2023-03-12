@@ -13,14 +13,20 @@ library(dplyr)
 
 app <- Dash$new(external_stylesheets = "https://codepen.io/chriddyp/pen/bWLwgP.css")
 
-app$layout(list(
-  htmlDiv(
+app$layout(
+  htmlDiv(list(htmlDiv(
     list(
       htmlH2("Motor Trend Cars")
     ), style = list('columnCount'=1, 
                     'background-color'= 'lightgrey', 
-                    'color'='black')
-  )))
+                    'color'='white')
+  ),htmlDiv(
+    list(
+      htmlH2("Motor Trend Cars")
+    ), style = list('columnCount'=1, 
+                    'background-color'= 'lightgrey', 
+                    'color'='white')
+  ))))
 
 
 app$run_server(debug = T)
