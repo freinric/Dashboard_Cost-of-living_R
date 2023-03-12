@@ -24,6 +24,8 @@ library(scales)
 
 # Data Input
 data <- read.csv("data_extra.csv", header = TRUE, sep = ",")
+provs = as.list(unique(data['province']))
+
 # Styles
 colors <- list('background'='dark',
                'background_dropdown'='#DDDDDD',
@@ -188,7 +190,72 @@ app$layout(dbcContainer(
   )
 )
 #------------------------------------------------------------------------------
+### CALLBACK GRAPHS AND CHECKBOXES ###
 
+app %>% add_callback(
+  Output(component_id='plot1', component_property='srcDoc'),
+  Output(component_id='plot2', component_property='srcDoc'),
+  Output(component_id='plot3', component_property='srcDoc'),
+  Output('prov_checklist', 'value'),
+  Output('drop3_b', 'options'),
+  Input(component_id='prov_checklist', component_property='value'),
+  Input('population', 'value'),
+  Input('drop1', 'value'),
+  Input('drop2_a', 'value'),
+  Input('drop2_b', 'value'),
+  Input('drop3_a', 'value'),
+  Input('drop3_b', 'value')
+)
+
+update_df <- funcion(options_chosen, population_chosen, 
+                     drop1_chosen, 
+                     drop2a_chosen, drop2b_chosen, 
+                     drop3a_chosen, drop3b_chosen) {
+  
+  # filter by population
+  popmin = population_chosen[0]
+  popmax = population_chosen[1]
+  dff = data[data['population'] %in% c(popmin, popmax), ]
+  
+  # filtering by provinces chosen + updating the checkboxes with 'select all'
+  if ("all" %in% options_chosen & len(options_chosen) == 13){
+    
+    options_chosen.remove('all') # remove 'all' from list, unhighlight
+    dff = dff[dff['province'] %in% (options_chosen)] # new df of filtered list
+    
+  } # want 'all' only highlighted when len = 14
+    
+  
+  else if ("all" %in% options_chosen){
+    
+    options_chosen = c("all", provs) # make all highlight when 'all' is chosen
+    #dff = dff # have all dataframe
+    
+  } # if 'all' is selected
+
+  
+  else if (!("all" %in% options_chosen) & len(options_chosen) == 13){
+    # if all provs are chosen, highlight 'all'
+    options_chosen = c("all", provs) # highlight 'all' if everything else is highlighted
+    #dff = dff
+    
+  } 
+  
+  else{
+    
+    # in all other cases where not 'all'
+    dff = dff[dff['province'] %in% (options_chosen)]
+    
+  } 
+  
+  # available cities according to provinces chosen
+  prov_cities = for (cities in dff['city']) {list('label' = cities, 'value' =  cities)}
+  
+  return (plot_altair1(dff, drop1_chosen), 
+          plot_altair2(dff, drop2a_chosen, drop2b_chosen), 
+          plot_altair3(dff, drop3a_chosen, drop3b_chosen),
+          options_chosen, prov_cities)
+}
 
 app$run_server(debug = T)
 
