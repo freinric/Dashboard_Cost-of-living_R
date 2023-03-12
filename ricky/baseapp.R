@@ -28,7 +28,6 @@ scatterplot <- function(xaxis="meal_cheap", yaxis="meal_cheap") {
     geom_point() + 
     theme_bw(20) +
     labs(y=yaxis, x=xaxis)
-  
   ggplotly(scatter_plot,
            width=500)}
 
@@ -39,13 +38,11 @@ barplot <- function(xaxis="meal_cheap") {
     geom_col(position = "dodge") + 
     theme_bw(20) +
     labs(x=xaxis, y="")
-  
-  ggplotly(bar_plot, height = 2000) 
+  ggplotly(bar_plot, height = 2000, width = 700) 
 }
 
 
 lineplot <- function(xaxis="meal_cheap", yaxis="meal_cheap") {
-  
   line_plot <- df %>% 
     ggplot(aes(x=!!sym(xaxis), y=!!sym(yaxis))) +
     geom_line() + 
@@ -153,19 +150,19 @@ app$layout(htmlDiv(list(
               htmlDiv( ## beside each other
                 list(
                   htmlDiv(
-                    list(
+                    list(htmlH2('plot 1 title'),
                       graph_bar
                     ), style=list('width'='100%')
                   ),
                   
                   htmlDiv(list(
                     htmlDiv(
-                      list(
+                      list(htmlH2('plot 2 title'),
                         graph_scatter
                       ), style=list('width'='100%')
                     ),
                     htmlDiv(
-                      list(
+                      list(htmlH2('plot 3 title'),
                         graph_line
                       ), style=list('width'='100%')
                     )))
