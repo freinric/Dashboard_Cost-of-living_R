@@ -165,31 +165,20 @@ num_bins <- dccSlider(
 
 # Start the layout
 app$layout(htmlDiv(list(
-  # TITLE BAR
-  htmlDiv(
-    list(
-      htmlH1("City test")
-    ), style = list('columnCount'=1, 
-                    'background-color'= 'black', 
-                    'color'='white',
-                    'text-align'='center')
-  ),
   # SIDEBAR
   htmlDiv(list(
     htmlDiv(
         list(
           htmlDiv(
             list(
-              # Dropdowns
-              htmlP("Select a variable for the x-axis:"),
-              # Use htmlBr() for line breaks
+              htmlH1("Where do you want to live?"),
+              htmlH2("Cost of Living Dashboard"),
               htmlBr(),
-              htmlP("Select a variable for the y-axis:"),
-              yaxis,
-              htmlP("Choose the number of bins for your histogram:"),
-              num_bins,
+              htmlH3("Select Provinces"),
+              htmlP('checkboxes'),
               htmlBr(),
-              htmlP("placeholder text")
+              htmlH3('Select City Population'),
+              htmlP("slider")
             ), style = list('background-color'='lightgrey', 
                             'columnCount'=1, 
                             'white-space'='pre-line',
