@@ -282,9 +282,10 @@ app$callback(
   output(id = 'scatter_plot', property = 'figure'),
   params=list(input(id='drop2a', property = 'value'),
               input(id='drop2b', property = 'value'),
-              input(id='population1', property  = 'value')),
-  function(drop2a, drop2b, population1) {
-    scatterplot(drop2a, drop2b, population1)
+              input(id='population1', property  = 'value'),
+              input(id='prov_checklist', property  = 'value')),
+  function(drop2a, drop2b, population1, prov_chosen) {
+    scatterplot(drop2a, drop2b, population1, prov_chosen)
   }
 )
 
@@ -294,10 +295,11 @@ app$callback(
   
   params=list(input(id='drop3a', property = 'value'),
               input(id='drop3b', property = 'value'),
-              input(id='population1', property  = 'value')),
+              input(id='population1', property  = 'value'),
+              input(id='prov_checklist', property  = 'value')),
   
-  function(drop3a, drop3b, population1) {
-    plot3(drop3a, drop3b, population1)
+  function(drop3a, drop3b, population1, prov_chosen) {
+    plot3(drop3a, drop3b, population1, prov_chosen)
   }
 )
 
