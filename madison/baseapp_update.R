@@ -22,9 +22,9 @@ options(repr.plot.width = 10, repr.plot.height = 10)
 barplot <- function(drop1="meal_cheap", population1 = list(0,2800000)) {
   
   # filtering df for population slider
-  popmin <- population1[0]
-  popmax <- population1[1]
-  dfff <- filter(df, df$population %in% popmin:popmax)
+  popmin <- population1[1]
+  popmax <- population1[2]
+  dfff <- dplyr::filter(df, df$population %in% popmin:popmax)
   
   options(repr.plot.width = 10, repr.plot.height = 20)
   bar_plot <- dfff %>% dplyr::filter(!!sym(drop1) > 0)%>% 
@@ -38,9 +38,9 @@ barplot <- function(drop1="meal_cheap", population1 = list(0,2800000)) {
 scatterplot <- function(drop2a="meal_cheap", drop2b="meal_mid", population1 = list(0,2800000)) {
   
   # filtering df for population slider
-  popmin <- population1[0]
-  popmax <- population1[1]
-  dfff <- filter(df, df$population %in% popmin:popmax)
+  popmin <- population1[1]
+  popmax <- population1[2]
+  dfff <-  dplyr::filter(df, df$population %in% popmin:popmax)
   
   #Return the ggplot
   scatter_plot <- dfff %>% 
@@ -55,9 +55,9 @@ plot3 <- function(drop3a="meal_cheap", drop3b=list("Edmonton", "Kelowna"), popul
   dff <- df %>% dplyr::filter(city %in% drop3b)
   
   # filtering df for population slider
-  popmin <- population1[0]
-  popmax <- population1[1]
-  dfff <- filter(dff, dff$population %in% popmin:popmax)
+  popmin <- population1[1]
+  popmax <- population1[2]
+  dfff <-  dplyr::filter(dff, dff$population %in% popmin:popmax)
   
   plot3 <- dfff %>% 
     ggplot(aes(x=!!sym(drop3a), y=reorder(city, -!!sym(drop3a)))) +
@@ -175,7 +175,7 @@ app$layout(htmlDiv(list(
             htmlDiv(
               list(
                 dccRangeSlider(
-                  id='population',
+                  id='population1',
                   min=0,
                   max=2800000, step = 1000,
                   marks = list('100000'='100k',
@@ -233,7 +233,7 @@ app$callback(
   output(id = 'bar_plot', property = 'figure'),
   params=list(input(id='drop1', property = 'value'),
               input(id='population1', property  = 'value')),
-  function(drop1, as.population1) {
+  function(drop1, population1) {
     barplot(drop1, population1)
   }
 )
