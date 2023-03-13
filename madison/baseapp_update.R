@@ -51,9 +51,9 @@ plot3 <- function(drop3a="meal_cheap", drop3b=list("Edmonton", "Kelowna"), popul
   dff <- df %>% dplyr::filter(city %in% drop3b)
   
   # filtering df for population slider
-  #dfff <- dff %>% filter( between(df$population, population1[[1]], population1[[2]]) )
+  dfff <- dff %>% filter( between(dff$population, population1[[1]], population1[[2]]) )
   
-  plot3 <- dff %>% 
+  plot3 <- dfff %>% 
     ggplot(aes(x=!!sym(drop3a), y=reorder(city, -!!sym(drop3a)))) +
     geom_col() + 
     theme_bw(20) +
