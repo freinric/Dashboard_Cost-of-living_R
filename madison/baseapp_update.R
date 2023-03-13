@@ -22,9 +22,7 @@ options(repr.plot.width = 10, repr.plot.height = 10)
 barplot <- function(drop1="meal_cheap", population1 = list(0,2800000)) {
   
   # filtering df for population slider
-  popmin <- population1[1]
-  popmax <- population1[2]
-  dfff <- dplyr::filter(df, df$population %in% popmin:popmax)
+  dfff <- df %>% filter( between(df$population, population1[[1]], population1[[2]]) )
   
   options(repr.plot.width = 10, repr.plot.height = 20)
   bar_plot <- dfff %>% dplyr::filter(!!sym(drop1) > 0)%>% 
@@ -38,9 +36,7 @@ barplot <- function(drop1="meal_cheap", population1 = list(0,2800000)) {
 scatterplot <- function(drop2a="meal_cheap", drop2b="meal_mid", population1 = list(0,2800000)) {
   
   # filtering df for population slider
-  popmin <- population1[1]
-  popmax <- population1[2]
-  dfff <-  dplyr::filter(df, df$population %in% popmin:popmax)
+  dfff <- df %>% filter( between(df$population, population1[[1]], population1[[2]]) )
   
   #Return the ggplot
   scatter_plot <- dfff %>% 
@@ -55,11 +51,9 @@ plot3 <- function(drop3a="meal_cheap", drop3b=list("Edmonton", "Kelowna"), popul
   dff <- df %>% dplyr::filter(city %in% drop3b)
   
   # filtering df for population slider
-  popmin <- population1[1]
-  popmax <- population1[2]
-  dfff <-  dplyr::filter(dff, dff$population %in% popmin:popmax)
+  #dfff <- dff %>% filter( between(df$population, population1[[1]], population1[[2]]) )
   
-  plot3 <- dfff %>% 
+  plot3 <- dff %>% 
     ggplot(aes(x=!!sym(drop3a), y=reorder(city, -!!sym(drop3a)))) +
     geom_col() + 
     theme_bw(20) +
@@ -187,7 +181,7 @@ app$layout(htmlDiv(list(
                                '3000000'='3M'),
                   value=list(0,2800000)
                 ),
-                htmlDiv(id='population1')
+                htmlDiv(id='population1-output')
               )
             )
           ), style = list('background-color'='lightgrey', 
